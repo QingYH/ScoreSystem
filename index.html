@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级学生查分系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .login-form {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #4a00e0;
+            box-shadow: 0 0 0 2px rgba(74, 0, 224, 0.2);
+            outline: none;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .student-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            width: 120px;
+            color: #555;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        .message-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .low-score {
+            background-color: #ffeaea;
+            border-left: 5px solid #ff4d4d;
+            color: #b30000;
+        }
+        
+        .medium-score {
+            background-color: #fff4e6;
+            border-left: 5px solid #ff9900;
+            color: #cc6600;
+        }
+        
+        .good-score {
+            background-color: #e6f7ff;
+            border-left: 5px solid #1890ff;
+            color: #0066cc;
+        }
+        
+        .excellent-score {
+            background-color: #e6ffe6;
+            border-left: 5px solid #52c41a;
+            color: #006600;
+        }
+        
+        .no-score {
+            background-color: #f0f0f0;
+            border-left: 5px solid #999;
+            color: #666;
+        }
+        
+        .pdf-section {
+            margin-top: 25px;
+        }
+        
+        .pdf-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .pdf-container {
+            width: 100%;
+            height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #eee;
+            overflow: hidden;
+        }
+        
+        .pdf-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .pdf-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+            color: #666;
+            font-size: 18px;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .pdf-placeholder i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #8e2de2;
+        }
+        
+        .pdf-error {
+            background-color: #ffeaea;
+            color: #b30000;
+        }
+        
+        .logout-btn {
+            background: #f0f0f0;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+            }
+            
+            .info-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .pdf-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>查分系统</h1>
+            <p>请输入您的姓名和密码查询期中成绩</p>
+        </div>
+        
+        <div class="content">
+            <div class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="studentName">姓名</label>
+                    <input type="text" id="studentName" placeholder="请输入您的姓名">
+                </div>
+                <div class="form-group">
+                    <label for="studentPassword">密码</label>
+                    <input type="password" id="studentPassword" placeholder="请输入您的密码">
+                </div>
+                <button class="btn" id="loginBtn">查询成绩</button>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <div class="student-info">
+                    <div class="info-row">
+                        <div class="info-label">姓名：</div>
+                        <div class="info-value" id="displayName">-</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">学号：</div>
+                        <div class="info-value" id="displayId">-</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">期中测试分数：</div>
+                        <div class="info-value" id="displayScore">-</div>
+                    </div>
+                </div>
+                
+                <div class="message-box" id="messageBox">
+                    <!-- 根据分数显示的鼓励或提醒信息 -->
+                </div>
+                
+                <div class="pdf-section">
+                    <h3 class="pdf-title">答卷电子版</h3>
+                    <div class="pdf-container" id="pdfContainer">
+                        <!-- PDF将在这里显示 -->
+                        <div class="pdf-placeholder">
+                            <i>📄</i>
+                            <p>正在加载答卷...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="logout-btn" id="logoutBtn">返回重新查询</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 学生数据（来自Excel文件）
+        const students = [
+            { id: "061025022", name: "徐若伽", score: 69, password: "40772996" },
+            { id: "061025026", name: "程子昂", score: 44, password: "40773000" },
+            { id: "061025041", name: "朱静蕾", score: 44, password: "40773015" },
+            { id: "061025063", name: "王硕", score: 71, password: "40773037" },
+            { id: "061025078", name: "邹健乐", score: 93, password: "40773052" },
+            { id: "061025100", name: "吴子涵", score: 36, password: "40773074" },
+            { id: "061025103", name: "张怡", score: 37, password: "40773077" },
+            { id: "061025110", name: "胡恒远", score: 52, password: "40773084" },
+            { id: "061025111", name: "夏天香", score: 67, password: "40773085" },
+            { id: "061025117", name: "谢涵", score: 67, password: "40773091" },
+            { id: "080325015", name: "朱芮", score: 84, password: "60072989" },
+            { id: "080325019", name: "李欣怡", score: 94, password: "60072993" },
+            { id: "080325036", name: "俞光燕", score: 33, password: "60073010" },
+            { id: "080325042", name: "郭英姿", score: 46, password: "60073016" },
+            { id: "080325066", name: "张天乐", score: 80, password: "60073040" },
+            { id: "080325069", name: "李乐乐", score: 43, password: "60073043" },
+            { id: "080325071", name: "李志豪", score: 52, password: "60073045" },
+            { id: "080325073", name: "杨硕", score: 62, password: "60073047" },
+            { id: "080325074", name: "杨鋆妍", score: 44, password: "60073048" },
+            { id: "080325086", name: "金宇", score: 59, password: "60073060" },
+            { id: "080325088", name: "胡文远", score: 66, password: "60073062" },
+            { id: "080325089", name: "胡雨欣", score: 71, password: "60073063" },
+            { id: "080325094", name: "常俊", score: 48, password: "60073068" },
+            { id: "080825002", name: "韦书成", score: 87, password: "60572976" },
+            { id: "080825013", name: "汤子扬", score: 38, password: "60572987" },
+            { id: "080825014", name: "阮家豪", score: 25, password: "60572988" },
+            { id: "080825015", name: "何俊杰", score: 69, password: "60572989" },
+            { id: "080825028", name: "单宇阳", score: 35, password: "60573002" },
+            { id: "080825030", name: "姚勇棋", score: 50, password: "60573004" },
+            { id: "080825032", name: "段海冰", score: 45, password: "60573006" },
+            { id: "080825033", name: "唐亚", score: 51, password: "60573007" },
+            { id: "080825039", name: "鲍瑞锋", score: 42, password: "60573013" },
+            { id: "080825040", name: "蔡贤运", score: 74, password: "60573014" },
+            { id: "080825042", name: "方海涛", score: 69, password: "60573016" },
+            { id: "080825043", name: "韦宇恒", score: 63, password: "60573017" },
+            { id: "080825044", name: "韦嘉乐", score: 47, password: "60573018" },
+            { id: "080825046", name: "王昊宇", score: 52, password: "60573020" },
+            { id: "080825047", name: "王瑞琦", score: 33, password: "60573021" },
+            { id: "080825048", name: "叶啟军", score: 37, password: "60573022" },
+            { id: "080825049", name: "年博一", score: 50, password: "60573023" },
+            { id: "080825050", name: "刘子龙", score: 52, password: "60573024" },
+            { id: "080825051", name: "刘瑞", score: 51, password: "60573025" },
+            { id: "080825052", name: "朱勋振", score: 46, password: "60573026" },
+            { id: "080825057", name: "张宇洋", score: 39, password: "60573031" },
+            { id: "080825059", name: "张浩宇", score: 85, password: "60573033" },
+            { id: "080825060", name: "李俊杰", score: 46, password: "60573034" },
+            { id: "080825061", name: "杨文宇", score: 66, password: "60573035" },
+            { id: "080825062", name: "杨树园", score: 52, password: "60573036" },
+            { id: "080825065", name: "杨盛浩", score: 37, password: "60573039" },
+            { id: "080825075", name: "唐志远", score: 54, password: "60573049" },
+            { id: "080825076", name: "夏云勇", score: 34, password: "60573050" },
+            { id: "080825080", name: "谢超", score: 23, password: "60573054" },
+            { id: "081325001", name: "毛运朝", score: 68, password: "61072975" },
+            { id: "081325002", name: "韦玉", score: 48, password: "61072976" },
+            { id: "081325007", name: "孙耀坤", score: 54, password: "61072981" },
+            { id: "081325009", name: "朱行跃", score: 33, password: "61072983" },
+            { id: "081325019", name: "陈启睿", score: 37, password: "61072993" },
+            { id: "081325023", name: "姚智鹏", score: 56, password: "61072997" },
+            { id: "081325030", name: "韩紫嫣", score: 46, password: "61073004" },
+            { id: "081525088", name: "王童", score: 10, password: "61273062" },
+            { id: "081525091", name: "叶婷婷", score: 29, password: "61273065" },
+            { id: "081525120", name: "童欣怡", score: 71, password: "61273094" },
+            { id: "081525122", name: "舒智文", score: 38, password: "61273096" },
+            { id: "081525124", name: "韩玉洁", score: 37, password: "61273098" },
+            { id: "081525161", name: "梁晖", score: 59, password: "61273135" },
+            { id: "081525167", name: "谭慧慧", score: 30, password: "61273141" },
+            { id: "081525169", name: "马鑫宇", score: 49, password: "61273143" },
+            { id: "081525170", name: "孔艺涵", score: 8, password: "61273144" },
+            { id: "081525171", name: "方玉达", score: 9, password: "61273145" },
+            { id: "081525174", name: "王梦云", score: 58, password: "61273148" },
+            { id: "081525188", name: "张梦婷", score: 57, password: "61273162" },
+            { id: "081525200", name: "房银霏", score: 62, password: "61273174" },
+            { id: "081525206", name: "梁心怡", score: 61, password: "61273180" },
+            { id: "081525207", name: "梁宇琨", score: 50, password: "61273181" },
+            { id: "081525209", name: "霍浩然", score: 61, password: "61273183" },
+            { id: "081525210", name: "丁宇轩", score: 63, password: "61273184" },
+            { id: "081525211", name: "马自红", score: 48, password: "61273185" },
+            { id: "081525213", name: "牛好", score: 76, password: "61273187" },
+            { id: "081525222", name: "江海涛", score: null, password: "61273196" },
+            { id: "081525225", name: "张家福", score: 60, password: "61273199" },
+            { id: "081525235", name: "罗时武", score: 28, password: "61273209" },
+            { id: "081525240", name: "胡耀", score: 37, password: "61273214" },
+            { id: "081525242", name: "赵紫涵", score: 47, password: "61273216" },
+            { id: "081525243", name: "高庆鹏", score: 65, password: "61273217" },
+            { id: "081525244", name: "盛文涛", score: 54, password: "61273218" },
+            { id: "081825001", name: "卞勇乐", score: 63, password: "61572975" },
+            { id: "081825010", name: "朱贤涛", score: 51, password: "61572984" },
+            { id: "081825014", name: "张玉洁", score: 33, password: "61572988" },
+            { id: "081825015", name: "张鸣威", score: 43, password: "61572989" },
+            { id: "081825016", name: "张恒", score: 49, password: "61572990" },
+            { id: "081825023", name: "杨佳怡", score: 47, password: "61572997" },
+            { id: "081825027", name: "陈家乐", score: 56, password: "61573001" },
+            { id: "081825030", name: "明华东", score: 56, password: "61573004" },
+            { id: "081825032", name: "姚猛", score: 46, password: "61573006" },
+            { id: "081825035", name: "项可益", score: 28, password: "61573009" },
+            { id: "081825039", name: "湛益阳", score: 76, password: "61573013" }
+        ];
+
+        // 获取DOM元素
+        const loginForm = document.getElementById('loginForm');
+        const resultSection = document.getElementById('resultSection');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const studentNameInput = document.getElementById('studentName');
+        const studentPasswordInput = document.getElementById('studentPassword');
+        const displayName = document.getElementById('displayName');
+        const displayId = document.getElementById('displayId');
+        const displayScore = document.getElementById('displayScore');
+        const messageBox = document.getElementById('messageBox');
+        const pdfContainer = document.getElementById('pdfContainer');
+
+        // 登录按钮点击事件
+        loginBtn.addEventListener('click', function() {
+            const name = studentNameInput.value.trim();
+            const password = studentPasswordInput.value.trim();
+            
+            if (!name || !password) {
+                alert('请输入姓名和密码！');
+                return;
+            }
+            
+            // 查找学生
+            const student = students.find(s => s.name === name && s.password === password);
+            
+            if (student) {
+                // 显示学生信息
+                displayName.textContent = student.name;
+                displayId.textContent = student.id;
+                displayScore.textContent = student.score !== null ? student.score : '暂无成绩';
+                
+                // 根据分数显示不同的消息
+                let message = '';
+                let messageClass = '';
+                
+                if (student.score === null) {
+                    message = '请及时和老师沟通如何补考';
+                    messageClass = 'no-score';
+                } else if (student.score < 20) {
+                    message = '请深刻认识自己开学至今的学习态度，确实需要改变了，否则期末挂科是必然的了。希望及时端正学习态度，认真学习，要多花时间、多看多想多做多问。争取期末能考出好成绩！';
+                    messageClass = 'low-score';
+                } else if (student.score >= 20 && student.score < 40) {
+                    message = '请深刻反思，端正学习态度，认真学习，要多花时间、多看多想多做多问。争取期末能考出好成绩！';
+                    messageClass = 'low-score';
+                } else if (student.score >= 40 && student.score < 60) {
+                    message = '请补差补缺、自我总结，注意学习高数的方法，多看多想多做多问。争取期末能考出好成绩！';
+                    messageClass = 'medium-score';
+                } else if (student.score >= 60 && student.score < 80) {
+                    message = '请继续努力，争取期末能考得更好！';
+                    messageClass = 'good-score';
+                } else {
+                    message = '这次测试表现很不错，请继续奋斗，期末成绩更出色！';
+                    messageClass = 'excellent-score';
+                }
+                
+                messageBox.textContent = message;
+                messageBox.className = 'message-box ' + messageClass;
+                
+                // 显示PDF答卷
+                displayPDF(student.name);
+                
+                // 切换到结果页面
+                loginForm.style.display = 'none';
+                resultSection.style.display = 'block';
+            } else {
+                alert('姓名或密码错误，请重新输入！');
+                studentNameInput.value = '';
+                studentPasswordInput.value = '';
+                studentNameInput.focus();
+            }
+        });
+
+        // 显示PDF答卷
+        function displayPDF(studentName) {
+            pdfContainer.innerHTML = '';
+            
+            // 创建PDF查看器
+            const iframe = document.createElement('iframe');
+            
+            // 假设PDF文件放在名为"answers"的文件夹中，文件名为学生姓名
+            // 这里使用相对路径，实际部署时需要确保路径正确
+            const pdfPath = `answers/${studentName}.pdf`;
+            
+            iframe.src = pdfPath;
+            iframe.title = `${studentName}的答卷`;
+            
+            // 添加错误处理
+            iframe.onload = function() {
+                // 检查是否成功加载PDF
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc.body.innerHTML.includes('无法找到') || 
+                        iframeDoc.body.innerHTML.includes('404') ||
+                        iframeDoc.body.innerHTML.includes('Not Found')) {
+                        showPDFError('未找到该学生的答卷PDF文件');
+                    }
+                } catch (e) {
+                    // 跨域限制，无法检查内容
+                    console.log('无法检查PDF内容（可能是跨域限制）');
+                }
+            };
+            
+            iframe.onerror = function() {
+                showPDFError('加载PDF文件时出错，请检查文件路径或联系管理员');
+            };
+            
+            pdfContainer.appendChild(iframe);
+        }
+        
+        // 显示PDF错误信息
+        function showPDFError(message) {
+            pdfContainer.innerHTML = '';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'pdf-placeholder pdf-error';
+            errorDiv.innerHTML = `
+                <i>❌</i>
+                <p>${message}</p>
+                <p style="margin-top: 10px; font-size: 14px;">请确保PDF文件名为"学生姓名.pdf"并放在answers文件夹中</p>
+            `;
+            pdfContainer.appendChild(errorDiv);
+        }
+
+        // 返回按钮点击事件
+        logoutBtn.addEventListener('click', function() {
+            // 清空输入
+            studentNameInput.value = '';
+            studentPasswordInput.value = '';
+            
+            // 切换回登录页面
+            resultSection.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
